@@ -1,0 +1,70 @@
+import java.util.Scanner;
+
+public class Cronometro {
+    private static volatile boolean rodando = false; // Define se o cronômetro está rodando
+    private static volatile boolean sair = false; // Define se o programa deve ser encerrado
+    private static volatile int segundos = 0; // Tempo do cronômetro
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        Thread cronometroThread = new Thread(() -> {
+            while (!sair) {
+                try {
+                    if (rodando) {
+                        Thread.sleep(1000);
+                        segundos++;
+                        System.out.print("\rTempo: " + segundos + " segundos ");
+                    } else {
+                        Thread.sleep(200); // Pequeno atraso ao pausar
+                    }
+                } catch (InterruptedException e) {
+                    System.out.println("\nCronômetro interrompido.");
+                }
+            }
+        });
+
+        cronometroThread.start();
+
+        while (!sair) {
+            System.out.println("\nEscolha uma opção:");
+            System.out.println("1. Iniciar/Continuar");
+            System.out.println("2. Pausar");
+            System.out.println("3. Reiniciar");
+            System.out.println("4. Sair");
+            System.out.print("Escolha uma opção: ");
+            int opcao = sc.nextInt();
+
+            switch (opcao) {
+                case 1: // Iniciar ou continuar
+                    rodando = true;
+                    System.out.println("Cronômetro iniciado/continuado.");
+                    break;
+
+                case 2: // Pausar
+                    rodando = false;
+                    System.out.println("Cronômetro pausado.");
+                    break;
+
+                case 3: // Reiniciar
+                    rodando = false; // Garante que pare a contagem
+                    segundos = 0;   // Zera o cronômetro
+                    System.out.print("\rTempo: 0 segundos "); // Atualiza visualmente
+                    System.out.println("\nCronômetro reiniciado.");
+                    break;
+
+                case 4: // Sair
+                    rodando = false;
+                    sair = true;
+                    System.out.println("Cronômetro encerrado.");
+                    break;
+
+                default: // Opção inválida
+                    System.out.println("Opção inválida.");
+                    break;
+            }
+        }
+
+        sc.close();
+    }
+}
